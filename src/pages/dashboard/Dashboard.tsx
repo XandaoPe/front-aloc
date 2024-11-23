@@ -10,10 +10,9 @@ export const Dashboard = () => {
             {
                 <FerramentaDeDetalhes
                     mostrarBotaoSalvarEFechar
-                     />
+                />
             }
-        >
-
+            >
             Testando
         </LayoutBasePagina>
     )
