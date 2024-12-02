@@ -7,6 +7,7 @@ import { VTextField, VForm, IVFormErrors } from "../../shared/forms";
 import { Box, Grid2, LinearProgress, Paper, Typography } from "@mui/material";
 import { useVForm } from "../../shared/forms/useVForm";
 import * as yup from 'yup'
+import { AutoCompleteCidade } from "./components/AutoCompleteCidade";
 
 interface IFormData {
     email: string;
@@ -45,16 +46,14 @@ export const DetalheDePessoas: React.FC = () => {
             formRef.current?.setData({
                 nomeCompleto: '',
                 email: '',
-                cidadeId: '',
+                cidadeId: undefined,
             })
         }
-
     }, [id])
 
     const handleSave = (dados: IFormData) => {
-
-        formValidationSchema.
-            validate(dados, { abortEarly: false })
+        formValidationSchema
+            .validate(dados, { abortEarly: false })
             .then((dadosValidados) => {
 
                 setIsLoading(true)
@@ -72,9 +71,9 @@ export const DetalheDePessoas: React.FC = () => {
                                     navigate(`/pessoas/detalhe/${result}`)
                                 }
                             }
-        
+
                         })
-        
+
                 } else {
                     PessoasService
                         .updateById(id, { id, ...dadosValidados })
@@ -92,10 +91,10 @@ export const DetalheDePessoas: React.FC = () => {
                 console.log(dados)
             })
             .catch((errors: yup.ValidationError) => {
-                const validationErrors: IVFormErrors={};
+                const validationErrors: IVFormErrors = {};
 
-                errors.inner.forEach(error =>{
-                    if(!error.path) return;
+                errors.inner.forEach(error => {
+                    if (!error.path) return;
 
                     validationErrors[error.path] = error.message;
                 })
@@ -177,11 +176,7 @@ export const DetalheDePessoas: React.FC = () => {
 
                         <Grid2 container direction="row" spacing={2}>
                             <Grid2 size={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 2 }}>
-                                <VTextField
-                                    fullWidth
-                                    disabled={isLoading}
-                                    label="Cidade"
-                                    name="cidadeId" />
+                                <AutoCompleteCidade isExternalLoading={isLoading} />
                             </Grid2>
                         </Grid2>
                     </Grid2>
