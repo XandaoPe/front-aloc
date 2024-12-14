@@ -22,21 +22,21 @@ const formValidationSchema: yup.Schema<IFormData> = yup.object().shape({
 });
 
 export const DetalheDePessoas: React.FC = () => {
-    const { id = 'nova' } = useParams<'id'>();
+    const { _id = 'nova' } = useParams<'_id'>();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [nome, setNome] = useState('');
     const { formRef, save, saveAndClose, isSaveAndClose } = useVForm();
 
     useEffect(() => {
-        if (id !== 'nova') {
+        if (_id  !== 'nova') {
             setIsLoading(true);
-            PessoasService.getById(id)
+            PessoasService.getById(_id )
                 .then((result) => {
                     setIsLoading(false);
                     if (result instanceof Error) {
                         alert(result.message);
-                        navigate('/pessoas')
+                        navigate('/users')
                     } else {
                         setNome(result.nomeCompleto)
                         formRef.current?.setData(result)
@@ -49,7 +49,7 @@ export const DetalheDePessoas: React.FC = () => {
                 cidadeId: undefined,
             })
         }
-    }, [id])
+    }, [_id ])
 
     const handleSave = (dados: IFormData) => {
         formValidationSchema
@@ -57,7 +57,7 @@ export const DetalheDePessoas: React.FC = () => {
             .then((dadosValidados) => {
 
                 setIsLoading(true)
-                if (id === 'nova') {
+                if (_id === 'nova') {
                     PessoasService
                         .create(dadosValidados)
                         .then((result) => {
@@ -66,9 +66,9 @@ export const DetalheDePessoas: React.FC = () => {
                                 alert(result.message)
                             } else {
                                 if (isSaveAndClose()) {
-                                    navigate('/pessoas')
+                                    navigate('/users')
                                 } else {
-                                    navigate(`/pessoas/detalhe/${result}`)
+                                    navigate(`/users/detalhe/${result}`)
                                 }
                             }
 
@@ -76,14 +76,14 @@ export const DetalheDePessoas: React.FC = () => {
 
                 } else {
                     PessoasService
-                        .updateById(id, { id, ...dadosValidados })
+                        .updateById(_id, { _id, ...dadosValidados })
                         .then((result) => {
                             setIsLoading(false)
                             if (result instanceof Error) {
                                 alert(result.message)
                             } else {
                                 if (isSaveAndClose()) {
-                                    navigate('/pessoas')
+                                    navigate('/users')
                                 }
                             }
                         })
@@ -104,16 +104,16 @@ export const DetalheDePessoas: React.FC = () => {
 
     }
 
-    const handleDelete = (id: string) => {
+    const handleDelete = (_id : string) => {
         // eslint-disable-next-line
         if (confirm('Deseja realmente excluir este registro?')) {
-            PessoasService.deleteById(id)
+            PessoasService.deleteById(_id )
                 .then(result => {
                     if (result instanceof Error) {
                         alert(result.message)
                     } else {
                         alert('Registro deletado com sucesso !')
-                        navigate('/pessoas')
+                        navigate('/users')
                     }
                 })
         }
@@ -121,19 +121,19 @@ export const DetalheDePessoas: React.FC = () => {
 
     return (
         <LayoutBasePagina
-            titulo={id === 'nova' ? 'Nova Pessoa' : nome}
+            titulo={_id  === 'nova' ? 'Nova Pessoa' : nome}
             barraDeFerramentas={
                 <FerramentaDeDetalhes
                     textoBotaoNovo="Nova"
                     mostrarBotaoSalvarEFechar
-                    mostrarBotaoNovo={id !== 'nova'}
-                    mostrarBotaoApagar={id !== 'nova'}
+                    mostrarBotaoNovo={_id  !== 'nova'}
+                    mostrarBotaoApagar={_id  !== 'nova'}
 
                     aoClicarEmSalvar={save}
                     aoClicarEmSalvarEFechar={saveAndClose}
-                    aoClicarEmApagar={() => handleDelete(id)}
-                    aoClicarEmNovo={() => navigate('/pessoas/detalhe/nova')}
-                    aoClicarEmVoltar={() => navigate('/pessoas')}
+                    aoClicarEmApagar={() => handleDelete(_id )}
+                    aoClicarEmNovo={() => navigate('/users/detalhe/nova')}
+                    aoClicarEmVoltar={() => navigate('/users')}
                 />
             }
         >

@@ -22,7 +22,7 @@ export const ListagemDePessoas: React.FC = () => {
     }, [searchParams]);
 
     const pagina = useMemo(() => {
-        return Number(searchParams.get('pagina') || '1');
+        return Number(searchParams.get('page') || '1');
     }, [searchParams]);
 
     useEffect(() => {
@@ -42,16 +42,16 @@ export const ListagemDePessoas: React.FC = () => {
         })
     }, [busca, pagina])
 
-    const handleDelete = (id:string) =>{
+    const handleDelete = (_id :string) =>{
         // eslint-disable-next-line
         if(confirm('Deseja realmente excluir este registro?')){
-            PessoasService.deleteById(id)
+            PessoasService.deleteById(_id )
             .then(result =>{
                 if(result instanceof Error){
                     alert(result.message)
                 } else {
                     setRows(oldRows => [
-                            ...oldRows.filter(oldRow => oldRow.id !== id),
+                            ...oldRows.filter(oldRow => oldRow._id  !== _id ),
                         ]);
                     alert('Registro deletado com sucesso !')
                 }
@@ -67,7 +67,7 @@ export const ListagemDePessoas: React.FC = () => {
                     mostrarInputBusca
                     textoBotaoNovo="Nova"
                     textoDaBusca={busca}
-                    aoClicarEmNovo={()=> navigate('/pessoas/detalhe/nova')}
+                    aoClicarEmNovo={()=> navigate('/users/detalhe/nova')}
                     aoMudarTextoDaBusca={texto => setSearchParams({ busca: texto, pagina: '1' }, { replace: true })}
                 />
             }
@@ -83,12 +83,12 @@ export const ListagemDePessoas: React.FC = () => {
                     </TableHead>
                     <TableBody>
                         {rows.map(row => (
-                            <TableRow key={row.id}>
+                            <TableRow key={row._id }>
                                 <TableCell>
-                                    <IconButton size="small" onClick={()=> handleDelete(row.id)}>
+                                    <IconButton size="small" onClick={()=> handleDelete(row._id )}>
                                         <Icon>delete</Icon>
                                     </IconButton>
-                                    <IconButton size="small" onClick={()=> navigate(`/pessoas/detalhe/${row.id}`)}>
+                                    <IconButton size="small" onClick={()=> navigate(`/users/detalhe/${row._id }`)}>
                                         <Icon>edit</Icon>
                                     </IconButton>
                                 </TableCell>
@@ -119,7 +119,7 @@ export const ListagemDePessoas: React.FC = () => {
                                     <Pagination
                                         page={pagina}
                                         count={Math.ceil(totalCount / Environments.LIMITE_DE_LINHAS)}
-                                        onChange={(_, newPage) => setSearchParams({ busca, pagina: newPage.toString() }, { replace: true })}
+                                        onChange={(_, newPage) => setSearchParams({ busca, page: newPage.toString() }, { replace: true })}
                                     />
                                 </TableCell>
                             </TableRow>

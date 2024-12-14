@@ -17,22 +17,27 @@ const formValidationSchema: yup.Schema<IFormData> = yup.object().shape({
 });
 
 export const DetalheDeCidades: React.FC = () => {
-    const { id = 'nova' } = useParams<'id'>();
+    const { _id = 'nova' } = useParams<'_id'>();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [nome, setNome] = useState('');
     const { formRef, save, saveAndClose, isSaveAndClose } = useVForm();
-
+    
+    console.log('id detalhe inicio...', _id)
+    
     useEffect(() => {
-        if (id !== 'nova') {
+        console.log('detalhe efect id...', _id)
+        if (_id !== 'nova') {
             setIsLoading(true);
-            CidadesService.getById(id)
+            CidadesService.getById(_id)
                 .then((result) => {
+                    console.log('result detalhe...', result)
                     setIsLoading(false);
                     if (result instanceof Error) {
                         alert(result.message);
-                        navigate('/cidades')
+                        navigate('/cities')
                     } else {
+                        console.log('result.nome...', result.nome)
                         setNome(result.nome)
                         formRef.current?.setData(result)
                     }
@@ -43,7 +48,7 @@ export const DetalheDeCidades: React.FC = () => {
             })
         }
 
-    }, [id])
+    }, [_id])
 
     const handleSave = (dados: IFormData) => {
 
@@ -52,44 +57,46 @@ export const DetalheDeCidades: React.FC = () => {
             .then((dadosValidados) => {
 
                 setIsLoading(true)
-                if (id === 'nova') {
+                if (_id === 'nova') {
                     CidadesService
                         .create(dadosValidados)
                         .then((result) => {
+                            console.log('handle...', result)
                             setIsLoading(false)
                             if (result instanceof Error) {
                                 alert(result.message)
                             } else {
                                 if (isSaveAndClose()) {
-                                    navigate('/cidades')
+                                    navigate('/cities')
                                 } else {
-                                    navigate(`/cidades/detalhe/${result}`)
+                                    navigate(`/cities/detalhe/${result}`)
                                 }
                             }
-        
+
                         })
-        
+
                 } else {
                     CidadesService
-                        .updateById(id, { id, ...dadosValidados })
+                        .updateById(_id, { _id, ...dadosValidados })
                         .then((result) => {
+                            console.log('handle edit...', result)
                             setIsLoading(false)
                             if (result instanceof Error) {
                                 alert(result.message)
                             } else {
                                 if (isSaveAndClose()) {
-                                    navigate('/cidades')
+                                    navigate('/cities')
                                 }
                             }
                         })
                 }
-                console.log(dados)
+                console.log('dados...', dados)
             })
             .catch((errors: yup.ValidationError) => {
-                const validationErrors: IVFormErrors={};
+                const validationErrors: IVFormErrors = {};
 
-                errors.inner.forEach(error =>{
-                    if(!error.path) return;
+                errors.inner.forEach(error => {
+                    if (!error.path) return;
 
                     validationErrors[error.path] = error.message;
                 })
@@ -99,16 +106,16 @@ export const DetalheDeCidades: React.FC = () => {
 
     }
 
-    const handleDelete = (id: string) => {
+    const handleDelete = (_id: string) => {
         // eslint-disable-next-line
         if (confirm('Deseja realmente excluir este registro?')) {
-            CidadesService.deleteById(id)
+            CidadesService.deleteById(_id)
                 .then(result => {
                     if (result instanceof Error) {
                         alert(result.message)
                     } else {
                         alert('Registro deletado com sucesso !')
-                        navigate('/cidades')
+                        navigate('/cities')
                     }
                 })
         }
@@ -116,19 +123,19 @@ export const DetalheDeCidades: React.FC = () => {
 
     return (
         <LayoutBasePagina
-            titulo={id === 'nova' ? 'Nova Cidade' : nome}
+            titulo={_id === 'nova' ? 'Nova Cidade' : nome}
             barraDeFerramentas={
                 <FerramentaDeDetalhes
                     textoBotaoNovo="Nova"
                     mostrarBotaoSalvarEFechar
-                    mostrarBotaoNovo={id !== 'nova'}
-                    mostrarBotaoApagar={id !== 'nova'}
+                    mostrarBotaoNovo={_id !== 'nova'}
+                    mostrarBotaoApagar={_id !== 'nova'}
 
                     aoClicarEmSalvar={save}
                     aoClicarEmSalvarEFechar={saveAndClose}
-                    aoClicarEmApagar={() => handleDelete(id)}
-                    aoClicarEmNovo={() => navigate('/cidades/detalhe/nova')}
-                    aoClicarEmVoltar={() => navigate('/cidades')}
+                    aoClicarEmApagar={() => handleDelete(_id)}
+                    aoClicarEmNovo={() => navigate('/cities/detalhe/nova')}
+                    aoClicarEmVoltar={() => navigate('/cities')}
                 />
             }
         >
@@ -158,7 +165,7 @@ export const DetalheDeCidades: React.FC = () => {
                                     name="nome" />
                             </Grid2>
                         </Grid2>
-                        
+
                     </Grid2>
 
                 </Box>

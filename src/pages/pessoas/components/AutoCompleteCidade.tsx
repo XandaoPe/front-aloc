@@ -5,7 +5,7 @@ import { useDebounce } from "../../../shared/hooks";
 import { useField } from "@unform/core";
 
 type TAutoCompleteOptions = {
-    id: string;
+    _id : string;
     label: string;
 }
 
@@ -40,7 +40,7 @@ export const AutoCompleteCidade: React.FC<IAutoCompleteCidadeProps> = ({ isExter
                         alert(result.message)
                         return
                     } else {
-                        setOpcoes(result.data.map(cidade => ({ id: cidade.id, label: cidade.nome })))
+                        setOpcoes(result.data.map(cidade => ({ _id: cidade._id, label: cidade.nome })))
                     }
                 })
         })
@@ -75,7 +75,7 @@ export const AutoCompleteCidade: React.FC<IAutoCompleteCidadeProps> = ({ isExter
             disabled={isExternalLoading}
             value={autoCompleteSelectedOption}
             onInputChange={(_, newValue) => setBusca(newValue)}
-            onChange={(_, newValue) => { setSelectedId(newValue?.id); setBusca(''); clearError(); }}
+            onChange={(_, newValue) => { setSelectedId(newValue?._id ); setBusca(''); clearError(); }}
             popupIcon={(isExternalLoading || isLoading) ? <CircularProgress size={28} /> : undefined}
             renderInput={(params) => (
                 <TextField

@@ -2,14 +2,14 @@ import { Environments } from "../../../environments";
 import { Api } from "../axios-config";
 
 export interface IlistagemPessoas {
-    id: string;
+    _id : string;
     email: string;
     cidadeId: string;
     nomeCompleto: string;
 }
 
 export interface IDetalhePessoas {
-    id: string;
+    _id : string;
     email: string;
     cidadeId: string;
     nomeCompleto: string;
@@ -20,14 +20,22 @@ type TPessoasComTotalCount = {
     totalCount: number;
 }
 
-const getAll = async (page = 1, filter = ''): Promise<TPessoasComTotalCount | Error> => {
+const getAll = async (page = 0, filter = ''): Promise<TPessoasComTotalCount | Error> => {
+    const urlTotal = `/users`;
+    const dataAll = await Api.get(urlTotal)
+    let countAllCities = 0
+    if (dataAll) {
+        countAllCities = dataAll.data.length
+    }
     try {
-        const urlRelativa = `/pessoas?_page=${page}&_limit=${Environments.LIMITE_DE_LINHAS}&nomeCompleto_like=${filter}`;
+        // const urlRelativa = `/pessoas?_page=${page}&_limit=${Environments.LIMITE_DE_LINHAS}&nomeCompleto_like=${filter}`;
+        const urlRelativa = `/users?page=${page}&limit=${Environments.LIMITE_DE_LINHAS}&keywork=${filter}`;
         const { data, headers } = await Api.get(urlRelativa);
         if (data) {
             return {
                 data,
-                totalCount: Number(headers['x-total-count'] || Environments.LIMITE_DE_LINHAS),
+                totalCount: countAllCities,
+                // totalCount: Number(headers['x-total-count'] || Environments.LIMITE_DE_LINHAS),
             }
         }
         return new Error('Erro ao listar os registros.')
@@ -37,25 +45,24 @@ const getAll = async (page = 1, filter = ''): Promise<TPessoasComTotalCount | Er
         return new Error((error as { message: string }).message || 'Erro ao listar os registros.')
     }
 }
-const getById = async (id: string): Promise<Error | IDetalhePessoas> => {
+const getById = async (_id : string): Promise<Error | IDetalhePessoas> => {
     try {
-        const { data } = await Api.get(`/pessoas/${id}`);
+        const { data } = await Api.get(`/users/${_id}`);
         if (data) {
             return data;
         }
         return new Error('Erro ao consultar o registro.')
 
     } catch (error) {
-        console.log(error);
         return new Error((error as { message: string }).message || 'Erro ao consultar o registro.')
     }
 };
 
-const create = async (dados: Omit<IDetalhePessoas, 'id'>): Promise<string | Error> => {
+const create = async (dados: Omit<IDetalhePessoas, '_id'>): Promise<string | Error> => {
     try {
-        const { data } = await Api.post<IDetalhePessoas>('/pessoas', dados);
+        const { data } = await Api.post<IDetalhePessoas>('/users', dados);
         if (data) {
-            return data.id;
+            return data._id ;
         }
         return new Error('Erro ao criar o registro.')
 
@@ -65,18 +72,18 @@ const create = async (dados: Omit<IDetalhePessoas, 'id'>): Promise<string | Erro
     }
 };
 
-const updateById = async (id: string, dados: IDetalhePessoas): Promise<void | Error> => {
+const updateById = async (_id : string, dados: IDetalhePessoas): Promise<void | Error> => {
     try {
-        await Api.put(`/pessoas/${id}`, dados);
+        await Api.put(`/users/${_id }`, dados);
     } catch (error) {
         console.log(error);
         return new Error((error as { message: string }).message || 'Erro ao alterar o registro.')
     }
 };
 
-const deleteById = async (id: string): Promise<void | Error> => {
+const deleteById = async (_id : string): Promise<void | Error> => {
     try {
-        await Api.delete(`/pessoas/${id}`);
+        await Api.delete(`/users/${_id }`);
     } catch (error) {
         console.log(error);
         return new Error((error as { message: string }).message || 'Erro ao deletar o registro.')
